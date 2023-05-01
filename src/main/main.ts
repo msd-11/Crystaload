@@ -11,12 +11,16 @@ import torrentStream = require('torrent-stream');
 import fs = require('fs');
 import { dirname } from 'path';
 import TorrentManager from './manager/TorrentManager';
+import Torrent from '../interfaces/Torrent';
 
 var mainWindow: any;
 var torrentManager: TorrentManager;
 
 function createWindow() {
+  console.log(__dirname);
   mainWindow = new BrowserWindow({
+    title: 'Crystaload',
+    autoHideMenuBar: true,
     width: 1000,
     height: 800,
     minWidth: 1000,
@@ -25,6 +29,7 @@ function createWindow() {
       preload: '/home/msd11/Projects/TorrentGame/Client/preload.js',
       nodeIntegration: true,
     },
+    icon: '/home/msd11/Projects/TorrentGame/Client/src/assets/logo.png',
   });
 
   torrentManager = new TorrentManager(mainWindow);
@@ -39,7 +44,7 @@ app.whenReady().then(() => {
     torrentManager.handleRemoveTorrent(_event, value)
   );
 
-  ipcMain.on('addTorrent', (_event, value) =>
+  ipcMain.on('addTorrent', (_event, value: Torrent) =>
     torrentManager.addTorrent(_event, value)
   );
   createWindow();

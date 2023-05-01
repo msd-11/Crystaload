@@ -3,6 +3,7 @@ import { BrowserWindow } from 'electron';
 import fs = require('fs');
 // @ts-ignore
 import torrentStream = require('torrent-stream');
+import Torrent from '../../interfaces/Torrent';
 
 class TorrentManager {
   allTorrents: any[] = [];
@@ -12,28 +13,26 @@ class TorrentManager {
     this.mainWindow = mainWindow;
   }
 
-  handlePauseTorrent(_event: any, torrent: any) {
+  handlePauseTorrent(_event: any, torrent: Torrent) {
     var currentTorrent = this.allTorrents.find(
       (x) => x.magnet_url === torrent.magnet_url
     );
 
     if (currentTorrent.isPaused) {
-      this.allTorrents
-        .find((x) => x.magnet_url === torrent.magnet_url)
-        .streams.map((value: any) => {
-          value.stream.pipe(value.writeStream);
-          value.stream.resume();
-        });
+      torrent.isPaused = false;
+      currentTorrent.isPaused = !currentTorrent.isPaused;
+      this.addTorrent(null, torrent);
     } else {
+      torrent.isPaused = true;
       this.allTorrents
         .find((x) => x.magnet_url === torrent.magnet_url)
         .streams.map((value: any) => {
           value.stream.unpipe(value.writeStream);
-          value.stream.pause();
+          value.stream.destroy();
         });
-    }
 
-    currentTorrent.isPaused = !currentTorrent.isPaused;
+      currentTorrent.isPaused = !currentTorrent.isPaused;
+    }
   }
 
   handleRemoveTorrent(_event: any, torrent: any) {
@@ -49,18 +48,27 @@ class TorrentManager {
     );
   }
 
-  addTorrent(_event: any, value: any) {
+  addTorrent(_event: any, value: Torrent) {
     // 1. CREATE THE TORRENT ENGINE
     var engine = torrentStream(value.magnet_url, { path: value.path });
 
     // 2. ADD TO LIST OF TORRENT
     this.mainWindow.webContents.send('updateTorrents', [value]);
-    this.allTorrents.push({
-      magnet_url: value.magnet_url,
-      isPaused: false,
-      engine: engine,
-      streams: [],
-    });
+
+    var existingTorrent = false;
+
+    if (
+      this.allTorrents.find((x) => x.magnet_url === value.magnet_url) ===
+      undefined
+    ) {
+      console.log('PUSH OUI');
+      this.allTorrents.push({
+        magnet_url: value.magnet_url,
+        isPaused: false,
+        engine: engine,
+        streams: [],
+      });
+    } else existingTorrent = true;
 
     // 3. START TORRENT ON READY
     engine.on('ready', () => {
@@ -71,30 +79,39 @@ class TorrentManager {
         totalLength += file.length;
 
         const stream = file.createReadStream();
-        const writeStream = fs.createWriteStream(value.path + file.name);
+        var writeStream: fs.WriteStream;
 
-        this.allTorrents
-          .find((x) => x.engine === engine)
-          .streams.push({ stream: stream, writeStream: writeStream });
+        if (existingTorrent) {
+          this.allTorrents
+            .find((x) => x.magnet_url === value.magnet_url)
+            .streams.find((x: any) => x.file.name === file.name).stream =
+            stream;
 
+          writeStream = this.allTorrents
+            .find((x) => x.magnet_url === value.magnet_url)
+            .streams.find((x: any) => x.file.name === file.name).writeStream;
+
+          this.allTorrents.find((x) => x.magnet_url === value.magnet_url)
+            .engine === engine;
+        } else {
+          writeStream = fs.createWriteStream(value.path + file.name);
+          this.allTorrents
+            .find((x) => x.engine === engine)
+            .streams.push({
+              stream: stream,
+              writeStream: writeStream,
+              file: file,
+            });
+        }
         stream.pipe(writeStream);
 
         stream.on('data', (chunk: any) => {
           totalDownloaded += chunk.length;
           const percent = ((totalDownloaded / totalLength) * 100).toFixed(2);
-          value.percent = percent;
-
-          if (this.allTorrents.find((x) => x.engine === engine).isPaused) {
-            stream.unpipe(writeStream);
-            stream.pause();
-          }
+          value.percent = Number(percent);
+          console.log(percent);
 
           this.mainWindow.webContents.send('updateTorrents', [value]);
-        });
-
-        stream.on('pause', () => {
-          console.log('paused');
-          console.log(stream.readableFlowing);
         });
       });
     });

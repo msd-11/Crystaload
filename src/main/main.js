@@ -5,7 +5,10 @@ var TorrentManager_1 = require("./manager/TorrentManager");
 var mainWindow;
 var torrentManager;
 function createWindow() {
+    console.log(__dirname);
     mainWindow = new electron_1.BrowserWindow({
+        title: 'Crystaload',
+        autoHideMenuBar: true,
         width: 1000,
         height: 800,
         minWidth: 1000,
@@ -13,7 +16,8 @@ function createWindow() {
         webPreferences: {
             preload: '/home/msd11/Projects/TorrentGame/Client/preload.js',
             nodeIntegration: true
-        }
+        },
+        icon: '/home/msd11/Projects/TorrentGame/Client/src/assets/logo.png'
     });
     torrentManager = new TorrentManager_1["default"](mainWindow);
     mainWindow.loadURL('http://localhost:5173');
