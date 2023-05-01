@@ -2,7 +2,7 @@
   <a href="#">
   </a>
   <p align="center">
-   <img width="150" height="150" src="https://transfer.sh/xg8ptF/test3.png" alt="Logo">
+   <img width="150" height="150" src="https://transfer.sh/taBWVi/test4.png" alt="Logo">
   </p>
   <h1 align="center"><b>Crystaload</b></h1>
   <p align="center">
@@ -28,7 +28,6 @@ Crystaload is a bittorrent client that specializes in downloading games. With a 
 - Save downloaded games to a preferred location.
 - Launch your installed games within the client.
 
-
 ## Screenshots
 
 ![Browse games](https://cdn.discordapp.com/attachments/764647594667933727/1101873442569076796/image.png)
@@ -39,17 +38,14 @@ Crystaload is a bittorrent client that specializes in downloading games. With a 
 
 - In progress
 
-    
-
 ## Roadmap
 
 - In progress
-
 
 ## Contributing
 
 Contributions are welcome from anyone! If you want to improve Crystaload, please feel free to fork this repository, make your changes, and submit a pull request.
 
 ## License
-This project is licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
 
+This project is licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
