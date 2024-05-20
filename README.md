@@ -2,7 +2,7 @@
   <a href="#">
   </a>
   <p align="center">
-   <img width="150" height="150" src="https://transfer.sh/taBWVi/test4.png" alt="Logo">
+   <img width="150" height="150" src="./public/logo2.png" alt="Logo">
   </p>
   <h1 align="center"><b>Crystaload</b></h1>
   <p align="center">
@@ -30,9 +30,9 @@ Crystaload is a bittorrent client that specializes in downloading games. With a 
 
 ## Screenshots
 
-![Browse games](https://cdn.discordapp.com/attachments/764647594667933727/1101873442569076796/image.png)
+![Browse games](./public/1.png)
 
-![Game detail](https://cdn.discordapp.com/attachments/764647594667933727/1101874909241675837/image.png)
+![Game detail](./public/detail.png)
 
 ## Installation
 
